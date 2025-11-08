@@ -1,0 +1,265 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: hads-config
+  namespace: hads
+  labels:
+    app: hads-ml-service
+data:
+  flask_env: "production"
+  log_level: "INFO"
+  workers: "4"
+
+  # Application configuration
+  app_name: "HADS ML Service"
+  app_version: "1.0.0"
+  debug_mode: "false"
+
+  # Database configuration
+  db_pool_size: "20"
+  db_max_overflow: "40"
+  db_pool_recycle: "3600"
+
+  # Cache configuration
+  cache_ttl: "3600"
+  cache_max_connections: "50"
+
+  # ML Model configuration
+  model_cache_ttl: "7200"
+  model_batch_size: "32"
+  model_prediction_timeout: "30"
+
+  # API configuration
+  api_timeout: "60"
+  api_max_retries: "3"
+  api_rate_limit: "1000"
+
+  # Logging configuration
+  log_format: "json"
+  log_output: "both"
+  log_retention_days: "30"
+
+  # Health check configuration
+  health_check_interval: "30"
+  health_check_timeout: "10"
+
+  # Feature flags
+  enable_graphql: "true"
+  enable_rest_api: "true"
+  enable_metrics: "true"
+  enable_cache: "true"
+  enable_compression: "true"
+
+  # Security configuration
+  cors_origins: "http://localhost:3000,http://localhost:5000"
+  cors_allow_credentials: "true"
+  cors_max_age: "86400"
+
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: hads-secrets
+  namespace: hads
+  labels:
+    app: hads-ml-service
+type: Opaque
+stringData:
+  database_url: "postgresql://hads_user:hads_password@postgres:5432/hads_dispatch"
+  redis_url: "redis://:redis_password@redis:6379/0"
+  secret_key: "your-secret-key-change-in-production-12345"
+
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: hads-docker-registry
+  namespace: hads
+type: kubernetes.io/dockercfg
+stringData:
+  .dockercfg: |
+    {
+      "docker.io": {
+        "auth": "base64_encoded_credentials_here",
+        "email": "your-email@example.com"
+      }
+    }
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: hads-nginx-config
+  namespace: hads
+data:
+  nginx.conf: |
+    user nginx;
+    worker_processes auto;
+    error_log /var/log/nginx/error.log warn;
+    pid /var/run/nginx.pid;
+
+    events {
+      worker_connections 1024;
+      use epoll;
+    }
+
+    http {
+      include /etc/nginx/mime.types;
+      default_type application/octet-stream;
+
+      log_format main '$remote_addr - $remote_user [$time_local] "$request" '
+                      '$status $body_bytes_sent "$http_referer" '
+                      '"$http_user_agent" "$http_x_forwarded_for"';
+
+      access_log /var/log/nginx/access.log main;
+
+      sendfile on;
+      tcp_nopush on;
+      tcp_nodelay on;
+      keepalive_timeout 65;
+      types_hash_max_size 2048;
+      client_max_body_size 20M;
+
+      gzip on;
+      gzip_vary on;
+      gzip_proxied any;
+      gzip_comp_level 6;
+      gzip_types text/plain text/css text/xml text/javascript
+                 application/json application/javascript application/xml+rss;
+
+      upstream hads_backend {
+        least_conn;
+        server hads-ml-service:80 max_fails=3 fail_timeout=30s;
+      }
+
+      server {
+        listen 8080;
+        server_name _;
+
+        location / {
+          proxy_pass http://hads_backend;
+          proxy_http_version 1.1;
+          proxy_set_header Upgrade $http_upgrade;
+          proxy_set_header Connection "upgrade";
+          proxy_set_header Host $host;
+          proxy_set_header X-Real-IP $remote_addr;
+          proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+          proxy_set_header X-Forwarded-Proto $scheme;
+          proxy_connect_timeout 60s;
+          proxy_send_timeout 60s;
+          proxy_read_timeout 60s;
+          proxy_buffering off;
+        }
+
+        location /health {
+          access_log off;
+          proxy_pass http://hads_backend;
+        }
+
+        location /metrics {
+          proxy_pass http://hads_backend;
+        }
+      }
+    }
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: hads-logging-config
+  namespace: hads
+data:
+  logging.json: |
+    {
+      "version": 1,
+      "disable_existing_loggers": false,
+      "formatters": {
+        "json": {
+          "()": "pythonjsonlogger.jsonlogger.JsonFormatter",
+          "format": "%(asctime)s %(name)s %(levelname)s %(message)s"
+        },
+        "standard": {
+          "format": "%(asctime)s [%(levelname)s] %(name)s: %(message)s"
+        }
+      },
+      "handlers": {
+        "console": {
+          "class": "logging.StreamHandler",
+          "level": "INFO",
+          "formatter": "json",
+          "stream": "ext://sys.stdout"
+        },
+        "file": {
+          "class": "logging.handlers.RotatingFileHandler",
+          "level": "DEBUG",
+          "formatter": "json",
+          "filename": "/app/src/logs/app.log",
+          "maxBytes": 10485760,
+          "backupCount": 5
+        }
+      },
+      "root": {
+        "level": "INFO",
+        "handlers": ["console", "file"]
+      },
+      "loggers": {
+        "flask": {
+          "level": "INFO",
+          "handlers": ["console", "file"],
+          "propagate": false
+        },
+        "werkzeug": {
+          "level": "WARNING",
+          "handlers": ["console"],
+          "propagate": false
+        }
+      }
+    }
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: hads-app-config
+  namespace: hads
+data:
+  settings.py: |
+    """
+    Application Configuration for Kubernetes
+    """
+    import os
+
+    class KubernetesConfig:
+        """Configuration for Kubernetes environment"""
+
+        # Flask
+        DEBUG = False
+        TESTING = False
+        ENV = "production"
+
+        # Database
+        SQLALCHEMY_DATABASE_URI = os.getenv('DATABASE_URL')
+        SQLALCHEMY_POOL_SIZE = int(os.getenv('DB_POOL_SIZE', 20))
+        SQLALCHEMY_MAX_OVERFLOW = int(os.getenv('DB_MAX_OVERFLOW', 40))
+        SQLALCHEMY_POOL_RECYCLE = int(os.getenv('DB_POOL_RECYCLE', 3600))
+
+        # Cache
+        REDIS_URL = os.getenv('REDIS_URL')
+        CACHE_TTL = int(os.getenv('CACHE_TTL', 3600))
+
+        # Security
+        SECRET_KEY = os.getenv('SECRET_KEY')
+
+        # Logging
+        LOG_LEVEL = os.getenv('LOG_LEVEL', 'INFO')
+        LOG_FORMAT = os.getenv('LOG_FORMAT', 'json')
+
+        # Models
+        MODEL_PATH = os.getenv('MODEL_PATH', '/app/models')
+        MODEL_CACHE_TTL = int(os.getenv('MODEL_CACHE_TTL', 7200))
+
+        # API
+        API_TIMEOUT = int(os.getenv('API_TIMEOUT', 60))
+
+        # Workers
+        WORKERS = int(os.getenv('WORKERS', 4))
