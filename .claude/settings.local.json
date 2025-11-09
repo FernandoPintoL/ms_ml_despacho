@@ -1,0 +1,14 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(python -m venv:*)",
+      "Bash(venvScriptsactivate)",
+      "Bash(pip install:*)",
+      "Bash(python:*)",
+      "Bash(timeout 5 curl:*)",
+      "Bash(curl:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}

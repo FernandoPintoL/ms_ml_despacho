@@ -1,0 +1,6 @@
+{"message": "Creating Flask app in production mode", "timestamp": "2025-11-08T07:36:56.792430", "level": "INFO", "logger": "ms_ml_despacho"}
+{"message": "Routes not yet fully implemented: attempted relative import beyond top-level package", "timestamp": "2025-11-08T07:36:56.800052", "level": "WARNING", "logger": "ms_ml_despacho"}
+{"message": "Starting Flask server on 0.0.0.0:5000", "timestamp": "2025-11-08T07:36:56.801791", "level": "INFO", "logger": "ms_ml_despacho"}
+{"message": "Creating Flask app in production mode", "timestamp": "2025-11-08T07:43:19.063550", "level": "INFO", "logger": "ms_ml_despacho"}
+{"message": "Routes not yet fully implemented: attempted relative import beyond top-level package", "timestamp": "2025-11-08T07:43:19.064892", "level": "WARNING", "logger": "ms_ml_despacho"}
+{"message": "Starting Flask server on 0.0.0.0:5000", "timestamp": "2025-11-08T07:43:19.069148", "level": "INFO", "logger": "ms_ml_despacho"}

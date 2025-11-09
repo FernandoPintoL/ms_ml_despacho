@@ -1,0 +1,32 @@
+# Core Framework
+Flask
+Flask-CORS
+Flask-RESTful
+python-dotenv
+python-dateutil
+
+# GraphQL (optional, but lighter)
+graphql-core
+
+# Database
+SQLAlchemy
+pyodbc
+
+# Caching
+redis
+
+# Validation
+pydantic
+
+# Security
+PyJWT
+bcrypt
+
+# HTTP
+requests
+
+# Production Server
+gunicorn
+
+# Utilities
+click

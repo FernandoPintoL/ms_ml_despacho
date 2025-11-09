@@ -1,0 +1,32 @@
+# Testing Dependencies for HADS ML Service
+
+# Core Testing
+pytest>=7.0.0
+pytest-cov>=4.0.0
+pytest-mock>=3.10.0
+pytest-xdist>=3.0.0  # Parallel execution
+pytest-timeout>=2.1.0  # Test timeouts
+pytest-flask>=1.2.0  # Flask testing utilities
+
+# Fixtures and Mocking
+faker>=15.0.0  # Generate fake data
+factory-boy>=3.2.0  # Test data factories
+
+# Code Quality
+coverage>=6.0
+coverage-badge>=1.1.0
+
+# Reporting
+pytest-html>=3.1.0  # HTML test reports
+pytest-json-report>=1.5.0  # JSON test reports
+
+# Performance Testing
+pytest-benchmark>=3.4.1
+memory-profiler>=0.60.0
+
+# Type Checking (Optional)
+mypy>=0.980
+pytest-mypy>=0.9.1
+
+# Documentation
+pytest-testmon>=2.1.0  # Test change detection
