@@ -1,6 +1,7 @@
 """
 GraphQL Schema Definition
 Complete GraphQL API schema with queries, mutations, and subscriptions
+Apollo Federation v2 Subgraph
 """
 
 import strawberry
@@ -111,10 +112,10 @@ class DispatchPrediction:
 # DISPATCH TYPES
 # ============================================
 
-@strawberry.type
+@strawberry.federation.type(keys=["id"])
 class Dispatch:
-    """Dispatch record"""
-    id: int
+    """Dispatch record - Apollo Federation entity"""
+    id: strawberry.ID = strawberry.federation.field(external=False)
     patient_name: str
     patient_age: int
     patient_location: Location
@@ -125,6 +126,35 @@ class Dispatch:
     hospital_id: Optional[int]
     created_at: str
     updated_at: str
+
+    @classmethod
+    def resolve_reference(cls, id: strawberry.ID):
+        """Resolve Dispatch entity reference for federation"""
+        from ..repositories.dispatch_repository import DispatchRepository
+        repo = DispatchRepository()
+        try:
+            dispatch_data = repo.get_dispatch(int(id))
+            if dispatch_data:
+                return cls(
+                    id=strawberry.ID(str(dispatch_data.get('id'))),
+                    patient_name=dispatch_data.get('patient_name', ''),
+                    patient_age=dispatch_data.get('patient_age', 0),
+                    patient_location=Location(
+                        latitude=dispatch_data.get('patient_location', {}).get('latitude', 0),
+                        longitude=dispatch_data.get('patient_location', {}).get('longitude', 0)
+                    ),
+                    description=dispatch_data.get('description', ''),
+                    severity_level=dispatch_data.get('severity_level', 0),
+                    status=dispatch_data.get('status', 'pending'),
+                    assigned_ambulance_id=dispatch_data.get('assigned_ambulance_id'),
+                    hospital_id=dispatch_data.get('hospital_id'),
+                    created_at=dispatch_data.get('created_at', ''),
+                    updated_at=dispatch_data.get('updated_at', '')
+                )
+            return None
+        except Exception as e:
+            print(f"Error resolving Dispatch reference: {e}")
+            return None
 
 
 @strawberry.type
@@ -160,10 +190,10 @@ class DispatchFeedback:
 # AMBULANCE TYPES
 # ============================================
 
-@strawberry.type
+@strawberry.federation.type(keys=["id"])
 class Ambulance:
-    """Ambulance record"""
-    id: int
+    """Ambulance record - Apollo Federation entity"""
+    id: strawberry.ID = strawberry.federation.field(external=False)
     code: str
     type: str  # basic, advanced, mobile_icu
     status: str  # available, in_transit, at_hospital, maintenance
@@ -175,6 +205,36 @@ class Ambulance:
     gps_accuracy: Optional[float]
     created_at: str
     updated_at: str
+
+    @classmethod
+    def resolve_reference(cls, id: strawberry.ID):
+        """Resolve Ambulance entity reference for federation"""
+        from ..repositories.ambulance_repository import AmbulanceRepository
+        repo = AmbulanceRepository()
+        try:
+            ambulance_data = repo.get_ambulance(int(id))
+            if ambulance_data:
+                return cls(
+                    id=strawberry.ID(str(ambulance_data.get('id'))),
+                    code=ambulance_data.get('code', ''),
+                    type=ambulance_data.get('type', 'basic'),
+                    status=ambulance_data.get('status', 'available'),
+                    driver_name=ambulance_data.get('driver_name', ''),
+                    driver_phone=ambulance_data.get('driver_phone', ''),
+                    equipment_level=ambulance_data.get('equipment_level', 1),
+                    current_location=Location(
+                        latitude=ambulance_data.get('current_location', {}).get('latitude', 0),
+                        longitude=ambulance_data.get('current_location', {}).get('longitude', 0)
+                    ),
+                    last_location_update=ambulance_data.get('last_location_update', ''),
+                    gps_accuracy=ambulance_data.get('gps_accuracy'),
+                    created_at=ambulance_data.get('created_at', ''),
+                    updated_at=ambulance_data.get('updated_at', '')
+                )
+            return None
+        except Exception as e:
+            print(f"Error resolving Ambulance reference: {e}")
+            return None
 
 
 @strawberry.type
@@ -550,4 +610,10 @@ class Subscription:
 # SCHEMA
 # ============================================
 
-schema = strawberry.Schema(query=Query, mutation=Mutation, subscription=Subscription)
+schema = strawberry.federation.Schema(
+    query=Query,
+    mutation=Mutation,
+    subscription=Subscription,
+    enable_federation_2=True,
+    types=[Dispatch, Ambulance]
+)

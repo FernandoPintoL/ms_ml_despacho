@@ -138,7 +138,7 @@ def register_routes(app: Flask):
             import traceback
             logger.error(f"Traceback: {traceback.format_exc()}")
 
-        # Register A/B Testing Dashboard Routes (Fase 3)
+        # Register A/B Testing Dashboard Routes (Fase 3, Paso 2)
         logger.info("Registering A/B Testing Dashboard routes...")
         try:
             from api.ab_testing_dashboard import ab_testing_bp
@@ -146,6 +146,17 @@ def register_routes(app: Flask):
             logger.info("✓ A/B Testing Dashboard routes registered successfully")
         except Exception as e:
             logger.error(f"✗ Could not register A/B Testing Dashboard routes: {e}")
+            import traceback
+            logger.error(f"Traceback: {traceback.format_exc()}")
+
+        # Register Monitoring Dashboard Routes (Fase 3, Paso 3)
+        logger.info("Registering Monitoring Dashboard routes...")
+        try:
+            from api.monitoring_dashboard import monitoring_bp
+            app.register_blueprint(monitoring_bp)
+            logger.info("✓ Monitoring Dashboard routes registered successfully")
+        except Exception as e:
+            logger.error(f"✗ Could not register Monitoring Dashboard routes: {e}")
             import traceback
             logger.error(f"Traceback: {traceback.format_exc()}")
 
@@ -220,6 +231,9 @@ def register_routes(app: Flask):
         logger.info("═══════════════════════════════════════════════════════")
         logger.info("Routes registered successfully")
         logger.info("✓ Dispatch Assignment API available at /api/v1/dispatch")
+        logger.info("✓ ML Dispatch API available at /api/v2/dispatch")
+        logger.info("✓ A/B Testing Dashboard available at /api/v3/ab-testing")
+        logger.info("✓ Monitoring Dashboard available at /api/v4/monitoring")
         logger.info("✓ Health check at /api/v1/dispatch/health")
 
         # Debug: Print all registered routes

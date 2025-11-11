@@ -1,0 +1,480 @@
+═════════════════════════════════════════════════════════════════════════════════
+  MS ML DESPACHO - FASE 1: IMPLEMENTACIÓN COMPLETA
+  Reglas Determinísticas + Recolección de Datos
+═════════════════════════════════════════════════════════════════════════════════
+
+ESTADO: ✅ COMPLETADO - Listo para Implementación
+
+═════════════════════════════════════════════════════════════════════════════════
+1. ARQUITECTURA IMPLEMENTADA
+═════════════════════════════════════════════════════════════════════════════════
+
+┌─────────────────────────────────────────────────────────────┐
+│                    SQL SERVER DATABASE                       │
+│                    ms_ml_despacho                            │
+├─────────────────────────────────────────────────────────────┤
+│  Schema: ml                                                  │
+│  ├─ assignment_history          ← PRINCIPAL (datos training)│
+│  ├─ trained_models              ← Registro de modelos       │
+│  ├─ predictions_log             ← Auditoría predicciones    │
+│  ├─ features_cache              ← Cache optimización        │
+│  ├─ model_configuration         ← Config de reglas          │
+│  ├─ metrics_summary             ← KPIs agregados            │
+│  ├─ audit_log                   ← Log de cambios            │
+│  └─ Vistas + Stored Procedures  ← Helpers útiles            │
+└─────────────────────────────────────────────────────────────┘
+                            │
+                            ↓
+         ┌──────────────────────────────────────┐
+         │     PYTHON MICROSERVICE - FASE 1     │
+         ├──────────────────────────────────────┤
+         │ DispatchAssignmentService            │
+         │ ├─ Regla 1: Ambulancia más cercana   │
+         │ ├─ Regla 2: Validar disponibilidad   │
+         │ └─ Regla 3: Personal por severidad   │
+         │                                      │
+         │ AssignmentHistoryRepository          │
+         │ ├─ Crear registros histórico         │
+         │ ├─ Leer datos para estadísticas      │
+         │ └─ Obtener datos para entrenar ML    │
+         └──────────────────────────────────────┘
+                            │
+                            ↓
+         ┌──────────────────────────────────────┐
+         │      REST API - 9 ENDPOINTS          │
+         ├──────────────────────────────────────┤
+         │ POST   /api/v1/dispatch/assign       │
+         │ POST   /api/v1/dispatch/assign/batch│
+         │ GET    /api/v1/dispatch/history/... │
+         │ GET    /api/v1/dispatch/statistics  │
+         │ ...                                  │
+         └──────────────────────────────────────┘
+
+═════════════════════════════════════════════════════════════════════════════════
+2. ARCHIVOS CREADOS (5)
+═════════════════════════════════════════════════════════════════════════════════
+
+1. scripts/01_create_schema.sql
+   ├─ 8 tablas SQL Server
+   ├─ Índices optimizados
+   ├─ Stored Procedures
+   ├─ Vistas para reportes
+   ├─ Constraints y validaciones
+   └─ Seed data (configuración Fase 1)
+
+   ➜ Ejecutar: sqlcmd -d ms_ml_despacho -i scripts/01_create_schema.sql
+
+2. src/services/dispatch_assignment_service.py
+   ├─ DispatchAssignmentService (700+ líneas)
+   ├─ Métodos:
+   │  ├─ assign_ambulance_and_personnel()    ← PRINCIPAL
+   │  ├─ _select_ambulance()                 ← Regla 1
+   │  ├─ _assign_paramedics()                ← Regla 3
+   │  ├─ _calculate_distance()               ← Haversine
+   │  └─ _validate_input_data()              ← Validación
+   └─ Logging y manejo de errores robusto
+
+3. src/repositories/assignment_history_repository.py
+   ├─ AssignmentHistoryRepository (500+ líneas)
+   ├─ Operaciones CRUD:
+   │  ├─ create_assignment_history()
+   │  ├─ get_assignment_by_dispatch()
+   │  ├─ get_recent_assignments()
+   │  ├─ get_assignments_for_training()
+   │  └─ ... 10+ métodos más
+   └─ Estadísticas y análisis
+
+4. src/api/dispatch_assignment_routes.py
+   ├─ Blueprint Flask con 9 endpoints
+   ├─ /assign             → Asignar ambulancia
+   ├─ /assign/batch       → Asignaciones lote
+   ├─ /history/*          → Obtener histórico
+   ├─ /statistics         → Estadísticas
+   └─ /health             → Health check
+
+5. Documentación (3 archivos)
+   ├─ FASE_1_IMPLEMENTATION_GUIDE.md      (Guía 120+ líneas)
+   ├─ scripts/SCHEMA_DIAGRAM.md           (Diagrama ER)
+   └─ IMPLEMENTATION_CHECKLIST.md         (Checklist ejecutable)
+
+═════════════════════════════════════════════════════════════════════════════════
+3. CÓMO FUNCIONA FASE 1
+═════════════════════════════════════════════════════════════════════════════════
+
+ENTRADA:
+{
+    "dispatch_id": 123,
+    "patient_latitude": 4.7110,
+    "patient_longitude": -74.0721,
+    "emergency_type": "trauma",
+    "severity_level": 4,
+    "available_ambulances": [{id: 1, lat: 4.7120, lon: -74.0700, ...}],
+    "available_paramedics": [{id: 1, level: "senior", ...}, ...],
+    "available_nurses": [...]
+}
+
+PROCESO:
+1. Validar entrada
+   ✓ ¿Tiene todos los campos requeridos?
+   ✓ ¿Son válidos los valores?
+
+2. Aplicar REGLA 1: Ambulancia más cercana
+   ├─ Calcular distancia GPS cada ambulancia (Haversine)
+   ├─ Filtrar: máximo 15km
+   ├─ Ordenar por distancia
+   └─ Seleccionar la más cercana → AMBULANCIA_ID
+   └─ Confianza: 0.5-0.95 según distancia
+
+3. Aplicar REGLA 3: Personal por severidad
+   ├─ Severidad 5 (Crítico): 3 paramédicos + enfermero
+   ├─ Severidad 4 (Alto):    2 paramédicos + enfermero
+   ├─ Severidad 3 (Medio):   2 paramédicos
+   ├─ Severidad 2 (Bajo-M):  1 paramédico
+   └─ Severidad 1 (Bajo):    1 paramédico
+   └─ Fallback automático a siguiente nivel si no hay disponibilidad
+
+4. Guardar en BD (ml.assignment_history)
+   ├─ Features: location, time, emergency_type, severity, availability, etc
+   ├─ Target: ambulance_id, paramedic_ids
+   └─ Post-asignación: response_time, outcome (se llena después)
+
+SALIDA:
+{
+    "success": true,
+    "ambulance_id": 1,           ← Ambulancia asignada
+    "paramedic_ids": [1, 2],     ← Personal asignado
+    "nurse_id": 10,              ← Enfermero (si aplica)
+    "distance_km": 0.25,         ← Distancia
+    "confidence": 0.92,          ← Confianza (0-1)
+    "assignment_type": "deterministic_rules",
+    "phase": 1,
+    "reasoning": "...",
+    "history_id": 456            ← Para actualizar después
+}
+
+═════════════════════════════════════════════════════════════════════════════════
+4. INTEGRACIÓN CON TUS MICROSERVICIOS
+═════════════════════════════════════════════════════════════════════════════════
+
+Flujo completo del sistema:
+
+n8n / MS-RECEPCIÓN
+    ↓
+    Solicitud ambulancia (GPS, tipo emergencia, etc)
+    ↓
+MS-ML-DESPACHO (Fase 1)
+    ├─ POST /api/v1/dispatch/assign
+    ├─ Aplica reglas determinísticas
+    ├─ Retorna: {ambulance_id, paramedic_ids, confidence}
+    └─ Guarda en ml.assignment_history
+    ↓
+MS-DESPACHO (Node.js)
+    ├─ Recibe asignación
+    ├─ Valida en su BD
+    ├─ Ejecuta despacho real
+    ├─ Notifica paramédico
+    └─ Registra resultado
+    ↓
+Después (cuando termina la atención):
+    ├─ MS-DESPACHO notifica resultado
+    └─ MS-ML-DESPACHO actualiza:
+       - actual_response_time_minutes
+       - patient_outcome
+       - was_optimal (para evaluación)
+
+═════════════════════════════════════════════════════════════════════════════════
+5. REGLAS IMPLEMENTADAS
+═════════════════════════════════════════════════════════════════════════════════
+
+REGLA 1: AMBULANCIA MÁS CERCANA
+────────────────────────────────
+Algoritmo:
+  1. Filtrar ambulancias con status = "available"
+  2. Calcular distancia GPS (Haversine) a ubicación emergencia
+  3. Aplicar máximo: 15km (configurable)
+  4. Retornar la de menor distancia
+
+Confianza:
+  - 0-2km   → 0.95 (muy cercana)
+  - 2-5km   → 0.85 (cercana)
+  - 5-10km  → 0.70 (distancia media)
+  - 10-15km → 0.50 (lejos)
+
+Fallback:
+  Si no hay ambulancias disponibles → Error
+
+
+REGLA 2: VALIDACIÓN DE DISPONIBILIDAD
+──────────────────────────────────────
+Automatizado en la función _select_ambulance()
+  - Filtra por status = "available"
+  - Valida que esté dentro de rango de servicio
+
+
+REGLA 3: ASIGNACIÓN DE PERSONAL POR SEVERIDAD
+───────────────────────────────────────────────
+Severidad 5 (Crítico/Extremo):
+  ├─ Cantidad: 3 paramédicos
+  ├─ Niveles: [senior, senior, junior]
+  ├─ Enfermero: SÍ
+  └─ Especialista: SÍ
+  └─ Confianza: 0.95
+
+Severidad 4 (Alto):
+  ├─ Cantidad: 2 paramédicos
+  ├─ Niveles: [senior, junior]
+  ├─ Enfermero: SÍ
+  └─ Confianza: 0.85
+
+Severidad 3 (Medio):
+  ├─ Cantidad: 2 paramédicos
+  ├─ Niveles: [junior, junior]
+  └─ Confianza: 0.75
+
+Severidad 2 (Bajo-Medio):
+  ├─ Cantidad: 1 paramédico
+  ├─ Nivel: [junior]
+  └─ Confianza: 0.70
+
+Severidad 1 (Bajo):
+  ├─ Cantidad: 1 paramédico
+  ├─ Nivel: [junior]
+  └─ Confianza: 0.65
+
+Fallback:
+  - Si no hay nivel requerido → usar nivel superior (senior → junior)
+  - Si no hay paramédicos → Error
+
+═════════════════════════════════════════════════════════════════════════════════
+6. API ENDPOINTS (9 TOTAL)
+═════════════════════════════════════════════════════════════════════════════════
+
+1. POST /api/v1/dispatch/assign
+   ├─ Propósito: Asignar ambulancia y personal
+   ├─ Body: dispatch_data (ver sección 3)
+   └─ Retorna: Asignación con ambulancia, personal, confianza
+
+2. POST /api/v1/dispatch/assign/batch
+   ├─ Propósito: Asignar múltiples en lote
+   ├─ Body: {dispatches: [dispatch1, dispatch2, ...]}
+   └─ Retorna: Array de resultados
+
+3. GET /api/v1/dispatch/history/<dispatch_id>
+   ├─ Propósito: Obtener histórico de una asignación
+   └─ Retorna: Datos completos del registro
+
+4. GET /api/v1/dispatch/history/recent?limit=50&hours=24
+   ├─ Propósito: Últimas asignaciones
+   └─ Query params: limit (max 500), hours
+
+5. GET /api/v1/dispatch/history/ambulance/<ambulance_id>
+   ├─ Propósito: Histórico de una ambulancia
+   └─ Retorna: Todas las asignaciones de esa ambulancia
+
+6. GET /api/v1/dispatch/statistics?hours=24
+   ├─ Propósito: Estadísticas globales
+   └─ Retorna: total, optimal_rate, avg_response_time, etc
+
+7. GET /api/v1/dispatch/statistics/ambulance/<ambulance_id>?hours=168
+   ├─ Propósito: Desempeño de una ambulancia
+   └─ Retorna: Performance metrics específicas
+
+8. GET /api/v1/dispatch/statistics/severity-distribution?hours=168
+   ├─ Propósito: Distribución de asignaciones por severidad
+   └─ Retorna: {1: count, 2: count, ...}
+
+9. GET /api/v1/dispatch/health
+   ├─ Propósito: Health check
+   └─ Retorna: Status, timestamp
+
+═════════════════════════════════════════════════════════════════════════════════
+7. RECOLECCIÓN DE DATOS (PLAN)
+═════════════════════════════════════════════════════════════════════════════════
+
+Objetivo de Fase 1:
+  ├─ Recolectar 500-1000 registros históricos
+  ├─ Usar reglas determinísticas (sin ML)
+  ├─ Duración: 2-3 meses
+  └─ Próximo: Entrenar modelo XGBoost en Fase 2
+
+Plan de recolección:
+  Semana 1-2:   Deployment y testing (0 registros)
+  Semana 3-4:   Primer mes live (100-150 registros)
+  Mes 2:        (200-300 registros)
+  Mes 3:        (200-250 registros)
+  ────────────────────────────────────
+  Total 3 meses: ~600-800 registros ✓ Suficiente para ML
+
+Qué se guarda automáticamente:
+  FEATURES (Input):
+    ├─ Ubicación: latitude, longitude, zone_code
+    ├─ Contexto: hour_of_day, day_of_week, is_weekend
+    ├─ Emergencia: emergency_type, severity_level
+    ├─ Disponibilidad: ambulances_count, paramedics_count, busy_%
+    └─ Histórico: avg_response_time_zone, active_dispatches
+
+  TARGET (Output):
+    ├─ assigned_ambulance_id       ← Lo que queremos predecir
+    ├─ assigned_paramedic_ids      ← Lo que queremos predecir
+    └─ assigned_paramedic_levels
+
+  POST-ASIGNACIÓN (Se llena después):
+    ├─ actual_response_time_minutes
+    ├─ patient_outcome
+    ├─ was_optimal                  ← LABEL para entrenar
+    └─ optimization_score
+
+═════════════════════════════════════════════════════════════════════════════════
+8. PASOS DE IMPLEMENTACIÓN
+═════════════════════════════════════════════════════════════════════════════════
+
+PASO 1: Base de Datos (30 min)
+  [ ] Conectarse a SQL Server
+  [ ] Crear BD: CREATE DATABASE ms_ml_despacho;
+  [ ] Ejecutar: scripts/01_create_schema.sql
+  [ ] Verificar: SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = 'ml';
+
+PASO 2: Integración Python (1-2 horas)
+  [ ] Copiar 3 archivos a proyecto:
+      - src/services/dispatch_assignment_service.py
+      - src/repositories/assignment_history_repository.py
+      - src/api/dispatch_assignment_routes.py
+  [ ] Instalar deps: pip install sqlalchemy python-dotenv
+  [ ] Configurar DB_URL en .env
+  [ ] Registrar blueprint en main.py:
+      app.register_blueprint(dispatch_assignment_bp)
+
+PASO 3: Testing (2-3 horas)
+  [ ] Verificar health: curl http://localhost:5000/api/v1/dispatch/health
+  [ ] Enviar asignación prueba
+  [ ] Verificar que se guardó en BD
+  [ ] Obtener estadísticas
+  [ ] Revisar logs
+
+PASO 4: Integración MS-DESPACHO (4-6 horas)
+  [ ] Llamar /api/v1/dispatch/assign desde ms-despacho
+  [ ] Usar resultado para asignar ambulancia
+  [ ] Notificar paramédico
+  [ ] Actualizar resultado cuando termina despacho
+
+PASO 5: Producción (2-3 horas)
+  [ ] Configurar variables de entorno
+  [ ] Backup automático de BD
+  [ ] Configurar logging y alertas
+  [ ] Monitoreo 24/7
+
+─────────────────────────────────────
+TOTAL: ~10-16 horas de implementación
+─────────────────────────────────────
+
+═════════════════════════════════════════════════════════════════════════════════
+9. PRÓXIMOS PASOS (FASE 2)
+═════════════════════════════════════════════════════════════════════════════════
+
+Cuando tengas 500+ registros en ml.assignment_history (en 2-3 meses):
+
+1. ENTRENAR MODELO XGBOOST
+   ├─ Cargar datos históricos
+   ├─ Preparar features y target
+   ├─ Entrenar modelo: XGBClassifier(n_estimators=100)
+   ├─ Evaluar accuracy (esperado: 85-95%)
+   └─ Guardar en models/ambulance_selector_v1.pkl
+
+2. REGISTRAR MODELO EN BD
+   ├─ INSERT ml.trained_models con metadata
+   ├─ Guardar accuracy, f1_score, feature_importance
+   └─ Marcar como is_active = 1
+
+3. CAMBIAR LÓGICA A PREDICCIÓN ML
+   ├─ Modificar DispatchAssignmentService
+   ├─ Cambiar de _assign_with_deterministic_rules() a _assign_with_ml_model()
+   ├─ Cargar modelo XGBoost
+   ├─ Hacer predicción en lugar de reglas
+   └─ Registrar en ml.predictions_log
+
+4. COMPARAR DESEMPEÑO
+   ├─ Fase 1 (reglas): ~85% optimal_rate esperado
+   ├─ Fase 2 (ML):     ~90-95% optimal_rate esperado
+   └─ Ganancia: +5-10% de asignaciones óptimas
+
+═════════════════════════════════════════════════════════════════════════════════
+10. SOPORTE Y TROUBLESHOOTING
+═════════════════════════════════════════════════════════════════════════════════
+
+PROBLEMA: "No ambulances available"
+CAUSA: Todas las ambulancias están >15km
+SOLUCIÓN: Aumentar AMBULANCE_MAX_DISTANCE_KM en config
+
+PROBLEMA: "No paramedics available"
+CAUSA: No hay paramédicos disponibles
+SOLUCIÓN: Fallback automático (se intenta nivel superior)
+
+PROBLEMA: Health check retorna error
+CAUSA: BD no conectada
+SOLUCIÓN: Verificar DATABASE_URL en .env
+
+PROBLEMA: Endpoints no responden
+CAUSA: Blueprint no registrado en main.py
+SOLUCIÓN: Agregar app.register_blueprint(dispatch_assignment_bp)
+
+PROBLEMA: Lento asignar ambulancia
+CAUSA: Demasiadas ambulancias o cálculos ineficientes
+SOLUCIÓN: Optimizar consulta, agregar índices, usar índice geoespacial
+
+═════════════════════════════════════════════════════════════════════════════════
+11. MÉTRICAS Y MONITOREO
+═════════════════════════════════════════════════════════════════════════════════
+
+KPIs a Monitorear:
+  ├─ total_assignments (por día/semana/mes)
+  ├─ optimal_rate (% asignaciones óptimas) - Objetivo: >85%
+  ├─ avg_response_time_minutes - Objetivo: <5 min
+  ├─ avg_distance_km - Seguimiento
+  ├─ paramedic_satisfaction (1-5) - Objetivo: >4
+  ├─ patient_satisfaction (1-5) - Objetivo: >4
+  ├─ assignment_error_rate (% fallos) - Objetivo: <1%
+  └─ db_size (crecimiento datos) - Seguimiento
+
+Queries útiles:
+  -- Optimal rate último día
+  SELECT CAST(COUNT(CASE WHEN was_optimal = 1 THEN 1 END) as FLOAT) / COUNT(*) * 100
+  FROM ml.assignment_history WHERE created_at > DATEADD(DAY, -1, GETUTCDATE());
+
+  -- Response time promedio por hora
+  SELECT HOUR(created_at) as hour, AVG(actual_response_time_minutes) as avg_time
+  FROM ml.assignment_history WHERE created_at > DATEADD(DAY, -1, GETUTCDATE())
+  GROUP BY HOUR(created_at);
+
+  -- Distribución por severidad
+  SELECT severity_level, COUNT(*) as count
+  FROM ml.assignment_history GROUP BY severity_level;
+
+═════════════════════════════════════════════════════════════════════════════════
+RESUMEN FINAL
+═════════════════════════════════════════════════════════════════════════════════
+
+✅ COMPLETADO:
+  • Esquema SQL Server 100% con 8 tablas
+  • Servicio Python Fase 1 (700+ líneas)
+  • Repositorio datos (500+ líneas)
+  • 9 endpoints REST documentados
+  • Documentación completa (3 archivos)
+
+⏰ PRÓXIMAS ACCIONES:
+  1. Ejecutar script SQL (scripts/01_create_schema.sql)
+  2. Integrar código Python en tu proyecto
+  3. Registrar blueprint Flask
+  4. Testing básico con curl
+  5. Integración con ms-despacho
+  6. Deploy a producción
+  7. Monitoreo 2-3 meses (recolectar datos)
+  8. Entrenar modelo XGBoost (Fase 2)
+
+📊 VISIÓN A LARGO PLAZO:
+  Fase 1 (Ahora):      Reglas determinísticas + recolectar datos
+  Fase 2 (En 3 meses): Modelo XGBoost + predicciones
+  Fase 3 (Futuro):     Multi-modelo, optimización continua
+
+═════════════════════════════════════════════════════════════════════════════════
+¡LISTO PARA IMPLEMENTACIÓN!
+═════════════════════════════════════════════════════════════════════════════════
