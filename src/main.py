@@ -160,6 +160,28 @@ def register_routes(app: Flask):
             import traceback
             logger.error(f"Traceback: {traceback.format_exc()}")
 
+        # Register Real Data Collection Routes (Fase 3, Paso 4)
+        logger.info("Registering Real Data Collection routes...")
+        try:
+            from api.real_data_api import real_data_bp
+            app.register_blueprint(real_data_bp)
+            logger.info("✓ Real Data Collection routes registered successfully")
+        except Exception as e:
+            logger.error(f"✗ Could not register Real Data Collection routes: {e}")
+            import traceback
+            logger.error(f"Traceback: {traceback.format_exc()}")
+
+        # Register Retraining Routes (Fase 3, Paso 5)
+        logger.info("Registering Retraining Pipeline routes...")
+        try:
+            from api.retraining_api import retraining_bp
+            app.register_blueprint(retraining_bp)
+            logger.info("✓ Retraining Pipeline routes registered successfully")
+        except Exception as e:
+            logger.error(f"✗ Could not register Retraining Pipeline routes: {e}")
+            import traceback
+            logger.error(f"Traceback: {traceback.format_exc()}")
+
         # Initialize services (COMENTADO TEMPORALMENTE - HAY ERROR DE IMPORT)
         logger.info("Attempting to register original services...")
         try:
@@ -234,6 +256,8 @@ def register_routes(app: Flask):
         logger.info("✓ ML Dispatch API available at /api/v2/dispatch")
         logger.info("✓ A/B Testing Dashboard available at /api/v3/ab-testing")
         logger.info("✓ Monitoring Dashboard available at /api/v4/monitoring")
+        logger.info("✓ Real Data Collection available at /api/v5/data")
+        logger.info("✓ Retraining Pipeline available at /api/v6/retraining")
         logger.info("✓ Health check at /api/v1/dispatch/health")
 
         # Debug: Print all registered routes
