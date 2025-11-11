@@ -8,7 +8,7 @@ LABEL description="HADS ML Microservice - Hospital Ambulance Dispatch System"
 # Set working directory
 WORKDIR /app
 
-# Install system dependencies
+# Install system dependencies for building
 RUN apt-get update && apt-get install -y --no-install-recommends \
     build-essential \
     gcc \
@@ -25,8 +25,6 @@ ENV PATH="/opt/venv/bin:$PATH"
 RUN pip install --upgrade pip setuptools wheel && \
     pip install --no-cache-dir -r requirements.txt
 
----
-
 # Stage 2: Runtime
 FROM python:3.11-slim
 
@@ -38,12 +36,25 @@ ENV PYTHONUNBUFFERED=1 \
     PATH="/opt/venv/bin:$PATH" \
     FLASK_ENV=production
 
-# Install runtime dependencies only
+# Install runtime dependencies (incluye soporte para SQL Server)
 RUN apt-get update && apt-get install -y --no-install-recommends \
     curl \
-    postgresql-client \
-    redis-tools \
+    wget \
+    gnupg2 \
+    ca-certificates \
+    apt-transport-https \
     && rm -rf /var/lib/apt/lists/*
+
+# Instalar Microsoft ODBC Driver for SQL Server (para conexión a SQL Server)
+# Usando el método moderno sin apt-key (compatible con Debian 12+)
+RUN apt-get update && \
+    curl https://packages.microsoft.com/keys/microsoft.asc -o /tmp/microsoft.asc && \
+    gpg --dearmor -o /usr/share/keyrings/microsoft-archive-keyring.gpg /tmp/microsoft.asc && \
+    echo "deb [signed-by=/usr/share/keyrings/microsoft-archive-keyring.gpg] https://packages.microsoft.com/debian/12/prod bookworm main" > /etc/apt/sources.list.d/mssql-release.list && \
+    apt-get update && \
+    ACCEPT_EULA=Y apt-get install -y --no-install-recommends \
+    msodbcsql17 \
+    && rm -rf /var/lib/apt/lists/* /tmp/microsoft.asc
 
 # Create non-root user
 RUN useradd -m -u 1000 appuser

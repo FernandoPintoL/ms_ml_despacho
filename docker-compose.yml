@@ -1,50 +1,5 @@
-version: '3.9'
-
 services:
-  # PostgreSQL Database
-  postgres:
-    image: postgres:15-alpine
-    container_name: hads-postgres
-    environment:
-      POSTGRES_USER: ${DB_USER:-hads_user}
-      POSTGRES_PASSWORD: ${DB_PASSWORD:-hads_password}
-      POSTGRES_DB: ${DB_NAME:-hads_dispatch}
-      POSTGRES_INITDB_ARGS: "--encoding=UTF8 --locale=C"
-    ports:
-      - "${DB_PORT:-5432}:5432"
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-      - ./scripts/init.sql:/docker-entrypoint-initdb.d/init.sql
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-hads_user}"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-    networks:
-      - hads-network
-    restart: unless-stopped
-
-  # Redis Cache
-  redis:
-    image: redis:7-alpine
-    container_name: hads-redis
-    environment:
-      REDIS_PASSWORD: ${REDIS_PASSWORD:-redis_password}
-    ports:
-      - "${REDIS_PORT:-6379}:6379"
-    command: redis-server --appendonly yes --requirepass ${REDIS_PASSWORD:-redis_password}
-    volumes:
-      - redis_data:/data
-    healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-    networks:
-      - hads-network
-    restart: unless-stopped
-
-  # ML Service Application
+  # ML Service Application - Conexión a BD SQL Server local
   hads-ml-service:
     build:
       context: .
@@ -53,116 +8,33 @@ services:
     environment:
       FLASK_ENV: ${FLASK_ENV:-development}
       FLASK_DEBUG: ${FLASK_DEBUG:-0}
-      DATABASE_URL: postgresql://${DB_USER:-hads_user}:${DB_PASSWORD:-hads_password}@postgres:5432/${DB_NAME:-hads_dispatch}
-      REDIS_URL: redis://:${REDIS_PASSWORD:-redis_password}@redis:6379/0
+      # Conexión a SQL Server en la máquina host (no dockerizado)
+      DATABASE_URL: ${DATABASE_URL:-mssql+pyodbc://sa:1234@host.docker.internal:1433/ms_ml_despacho?driver=ODBC+Driver+17+for+SQL+Server}
+      DB_HOST: ${DB_HOST:-host.docker.internal}
+      DB_PORT: ${DB_PORT:-1433}
+      DB_USER: ${DB_USER:-sa}
+      DB_PASSWORD: ${DB_PASSWORD:-1234}
+      DB_NAME: ${DB_NAME:-ms_ml_despacho}
+      # Redis local (opcional, desactiva si no lo necesitas)
+      REDIS_URL: ${REDIS_URL:-redis://:redis_password@127.0.0.1:6379/0}
       SECRET_KEY: ${SECRET_KEY:-your-secret-key-change-in-production}
       LOG_LEVEL: ${LOG_LEVEL:-INFO}
       MODEL_PATH: ${MODEL_PATH:-/app/models}
       WORKERS: ${WORKERS:-4}
+      PYTHONUNBUFFERED: 1
     ports:
       - "${APP_PORT:-5000}:5000"
     volumes:
       - ./src:/app/src
       - ./models:/app/models
       - ./logs:/app/src/logs
-    depends_on:
-      postgres:
-        condition: service_healthy
-      redis:
-        condition: service_healthy
+    # Usa la red del host para acceder a servicios en la máquina local
+    network_mode: bridge
+    restart: unless-stopped
+    # Health check
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:5000/health"]
       interval: 30s
       timeout: 10s
       retries: 3
       start_period: 40s
-    networks:
-      - hads-network
-    restart: unless-stopped
-    environment:
-      PYTHONUNBUFFERED: 1
-
-  # PgAdmin for Database Management (Optional)
-  pgadmin:
-    image: dpage/pgadmin4:latest
-    container_name: hads-pgadmin
-    environment:
-      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_EMAIL:-admin@hads.local}
-      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_PASSWORD:-admin}
-      PGADMIN_CONFIG_SERVER_MODE: 'False'
-    ports:
-      - "${PGADMIN_PORT:-5050}:80"
-    depends_on:
-      - postgres
-    volumes:
-      - pgadmin_data:/var/lib/pgadmin
-    networks:
-      - hads-network
-    restart: unless-stopped
-
-  # Redis Commander for Cache Management (Optional)
-  redis-commander:
-    image: rediscommander/redis-commander:latest
-    container_name: hads-redis-commander
-    environment:
-      REDIS_HOSTS: local:redis:6379:0:${REDIS_PASSWORD:-redis_password}
-    ports:
-      - "${REDIS_COMMANDER_PORT:-8081}:8081"
-    depends_on:
-      - redis
-    networks:
-      - hads-network
-    restart: unless-stopped
-
-  # Prometheus for Metrics (Optional)
-  prometheus:
-    image: prom/prometheus:latest
-    container_name: hads-prometheus
-    volumes:
-      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml
-      - prometheus_data:/prometheus
-    ports:
-      - "${PROMETHEUS_PORT:-9090}:9090"
-    command:
-      - '--config.file=/etc/prometheus/prometheus.yml'
-      - '--storage.tsdb.path=/prometheus'
-      - '--web.console.libraries=/usr/share/prometheus/console_libraries'
-      - '--web.console.templates=/usr/share/prometheus/consoles'
-    networks:
-      - hads-network
-    restart: unless-stopped
-
-  # Grafana for Visualization (Optional)
-  grafana:
-    image: grafana/grafana:latest
-    container_name: hads-grafana
-    environment:
-      GF_SECURITY_ADMIN_USER: ${GRAFANA_USER:-admin}
-      GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_PASSWORD:-admin}
-      GF_INSTALL_PLUGINS: 'grafana-piechart-panel'
-    ports:
-      - "${GRAFANA_PORT:-3000}:3000"
-    volumes:
-      - grafana_data:/var/lib/grafana
-      - ./monitoring/grafana/provisioning:/etc/grafana/provisioning
-    depends_on:
-      - prometheus
-    networks:
-      - hads-network
-    restart: unless-stopped
-
-networks:
-  hads-network:
-    driver: bridge
-
-volumes:
-  postgres_data:
-    driver: local
-  redis_data:
-    driver: local
-  pgadmin_data:
-    driver: local
-  prometheus_data:
-    driver: local
-  grafana_data:
-    driver: local

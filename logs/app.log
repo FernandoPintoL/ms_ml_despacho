@@ -286,3 +286,141 @@
 {"message": "  /api/v1/dispatch/assign                                      [POST]", "timestamp": "2025-11-11T04:11:40.917579", "level": "INFO", "logger": "ms_ml_despacho"}
 {"message": "\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550", "timestamp": "2025-11-11T04:11:40.917685", "level": "INFO", "logger": "ms_ml_despacho"}
 {"message": "Starting Flask server on 0.0.0.0:5000", "timestamp": "2025-11-11T04:11:40.919998", "level": "INFO", "logger": "ms_ml_despacho"}
+{"message": "Creating Flask app in production mode", "timestamp": "2025-11-11T15:38:03.381544", "level": "INFO", "logger": "ms_ml_despacho"}
+{"message": "Registering Dispatch Assignment routes...", "timestamp": "2025-11-11T15:38:03.427484", "level": "INFO", "logger": "ms_ml_despacho"}
+{"message": "\u2713 Dispatch Assignment routes registered successfully", "timestamp": "2025-11-11T15:38:03.436436", "level": "INFO", "logger": "ms_ml_despacho"}
+{"message": "Registering ML Dispatch routes...", "timestamp": "2025-11-11T15:38:03.436691", "level": "INFO", "logger": "ms_ml_despacho"}
+{"message": "\u2713 ML Dispatch routes registered successfully", "timestamp": "2025-11-11T15:38:04.744833", "level": "INFO", "logger": "ms_ml_despacho"}
+{"message": "Registering A/B Testing Dashboard routes...", "timestamp": "2025-11-11T15:38:04.783064", "level": "INFO", "logger": "ms_ml_despacho"}
+{"message": "\u2713 A/B Testing Dashboard routes registered successfully", "timestamp": "2025-11-11T15:38:05.136026", "level": "INFO", "logger": "ms_ml_despacho"}
+{"message": "Registering Monitoring Dashboard routes...", "timestamp": "2025-11-11T15:38:05.236455", "level": "INFO", "logger": "ms_ml_despacho"}
+{"message": "\u2713 Monitoring Dashboard routes registered successfully", "timestamp": "2025-11-11T15:38:07.892131", "level": "INFO", "logger": "ms_ml_despacho"}
+{"message": "Registering Real Data Collection routes...", "timestamp": "2025-11-11T15:38:07.904288", "level": "INFO", "logger": "ms_ml_despacho"}
+{"message": "\u2713 Real Data Collection routes registered successfully", "timestamp": "2025-11-11T15:38:07.936318", "level": "INFO", "logger": "ms_ml_despacho"}
+{"message": "Registering Retraining Pipeline routes...", "timestamp": "2025-11-11T15:38:07.939439", "level": "INFO", "logger": "ms_ml_despacho"}
+{"message": "\u2713 Retraining Pipeline routes registered successfully", "timestamp": "2025-11-11T15:38:10.826785", "level": "INFO", "logger": "ms_ml_despacho"}
+{"message": "Attempting to register original services...", "timestamp": "2025-11-11T15:38:10.908185", "level": "INFO", "logger": "ms_ml_despacho"}
+{"message": "\u26a0 Some original services not available: attempted relative import beyond top-level package", "timestamp": "2025-11-11T15:38:10.932660", "level": "WARNING", "logger": "ms_ml_despacho"}
+{"message": "\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550", "timestamp": "2025-11-11T15:38:10.991835", "level": "INFO", "logger": "ms_ml_despacho"}
+{"message": "Routes registered successfully", "timestamp": "2025-11-11T15:38:11.041718", "level": "INFO", "logger": "ms_ml_despacho"}
+{"message": "\u2713 Dispatch Assignment API available at /api/v1/dispatch", "timestamp": "2025-11-11T15:38:11.090108", "level": "INFO", "logger": "ms_ml_despacho"}
+{"message": "\u2713 ML Dispatch API available at /api/v2/dispatch", "timestamp": "2025-11-11T15:38:11.115118", "level": "INFO", "logger": "ms_ml_despacho"}
+{"message": "\u2713 A/B Testing Dashboard available at /api/v3/ab-testing", "timestamp": "2025-11-11T15:38:11.217965", "level": "INFO", "logger": "ms_ml_despacho"}
+{"message": "\u2713 Monitoring Dashboard available at /api/v4/monitoring", "timestamp": "2025-11-11T15:38:11.287862", "level": "INFO", "logger": "ms_ml_despacho"}
+{"message": "\u2713 Real Data Collection available at /api/v5/data", "timestamp": "2025-11-11T15:38:11.880985", "level": "INFO", "logger": "ms_ml_despacho"}
+{"message": "\u2713 Retraining Pipeline available at /api/v6/retraining", "timestamp": "2025-11-11T15:38:11.899192", "level": "INFO", "logger": "ms_ml_despacho"}
+{"message": "\u2713 Health check at /api/v1/dispatch/health", "timestamp": "2025-11-11T15:38:11.900183", "level": "INFO", "logger": "ms_ml_despacho"}
+{"message": "\nAll registered routes:", "timestamp": "2025-11-11T15:38:11.900744", "level": "INFO", "logger": "ms_ml_despacho"}
+{"message": "  /static/<path:filename>                                      [GET]", "timestamp": "2025-11-11T15:38:11.939550", "level": "INFO", "logger": "ms_ml_despacho"}
+{"message": "  /api/v1/dispatch/health                                      [GET]", "timestamp": "2025-11-11T15:38:11.979356", "level": "INFO", "logger": "ms_ml_despacho"}
+{"message": "  /api/v1/dispatch/test                                        [GET]", "timestamp": "2025-11-11T15:38:11.997887", "level": "INFO", "logger": "ms_ml_despacho"}
+{"message": "  /api/v1/dispatch/assign                                      [POST]", "timestamp": "2025-11-11T15:38:12.019674", "level": "INFO", "logger": "ms_ml_despacho"}
+{"message": "  /api/v2/dispatch/health                                      [GET]", "timestamp": "2025-11-11T15:38:12.039816", "level": "INFO", "logger": "ms_ml_despacho"}
+{"message": "  /api/v2/dispatch/predict                                     [POST]", "timestamp": "2025-11-11T15:38:12.067721", "level": "INFO", "logger": "ms_ml_despacho"}
+{"message": "  /api/v2/dispatch/predict/batch                               [POST]", "timestamp": "2025-11-11T15:38:12.083622", "level": "INFO", "logger": "ms_ml_despacho"}
+{"message": "  /api/v2/dispatch/model/info                                  [GET]", "timestamp": "2025-11-11T15:38:12.101581", "level": "INFO", "logger": "ms_ml_despacho"}
+{"message": "  /api/v2/dispatch/model/feature-importance                    [GET]", "timestamp": "2025-11-11T15:38:12.150752", "level": "INFO", "logger": "ms_ml_despacho"}
+{"message": "  /api/v3/ab-testing/status                                    [GET]", "timestamp": "2025-11-11T15:38:12.164642", "level": "INFO", "logger": "ms_ml_despacho"}
+{"message": "  /api/v3/ab-testing/dashboard                                 [GET]", "timestamp": "2025-11-11T15:38:12.176830", "level": "INFO", "logger": "ms_ml_despacho"}
+{"message": "  /api/v3/ab-testing/comparison                                [GET]", "timestamp": "2025-11-11T15:38:12.199783", "level": "INFO", "logger": "ms_ml_despacho"}
+{"message": "  /api/v3/ab-testing/decide-phase                              [POST]", "timestamp": "2025-11-11T15:38:12.207759", "level": "INFO", "logger": "ms_ml_despacho"}
+{"message": "  /api/v3/ab-testing/log                                       [POST]", "timestamp": "2025-11-11T15:38:12.252832", "level": "INFO", "logger": "ms_ml_despacho"}
+{"message": "  /api/v3/ab-testing/recommendation                            [GET]", "timestamp": "2025-11-11T15:38:12.289500", "level": "INFO", "logger": "ms_ml_despacho"}
+{"message": "  /api/v3/ab-testing/metrics                                   [GET]", "timestamp": "2025-11-11T15:38:12.307028", "level": "INFO", "logger": "ms_ml_despacho"}
+{"message": "  /api/v3/ab-testing/strategies                                [GET]", "timestamp": "2025-11-11T15:38:12.324791", "level": "INFO", "logger": "ms_ml_despacho"}
+{"message": "  /api/v4/monitoring/health                                    [GET]", "timestamp": "2025-11-11T15:38:12.349034", "level": "INFO", "logger": "ms_ml_despacho"}
+{"message": "  /api/v4/monitoring/health/database                           [GET]", "timestamp": "2025-11-11T15:38:12.353945", "level": "INFO", "logger": "ms_ml_despacho"}
+{"message": "  /api/v4/monitoring/health/model                              [GET]", "timestamp": "2025-11-11T15:38:12.358399", "level": "INFO", "logger": "ms_ml_despacho"}
+{"message": "  /api/v4/monitoring/health/predictions                        [GET]", "timestamp": "2025-11-11T15:38:12.363623", "level": "INFO", "logger": "ms_ml_despacho"}
+{"message": "  /api/v4/monitoring/health/fallback                           [GET]", "timestamp": "2025-11-11T15:38:12.368653", "level": "INFO", "logger": "ms_ml_despacho"}
+{"message": "  /api/v4/monitoring/drift/prediction                          [GET]", "timestamp": "2025-11-11T15:38:12.372063", "level": "INFO", "logger": "ms_ml_despacho"}
+{"message": "  /api/v4/monitoring/drift/performance                         [GET]", "timestamp": "2025-11-11T15:38:12.375846", "level": "INFO", "logger": "ms_ml_despacho"}
+{"message": "  /api/v4/monitoring/drift/data-quality                        [GET]", "timestamp": "2025-11-11T15:38:12.378582", "level": "INFO", "logger": "ms_ml_despacho"}
+{"message": "  /api/v4/monitoring/alerts/active                             [GET]", "timestamp": "2025-11-11T15:38:12.381916", "level": "INFO", "logger": "ms_ml_despacho"}
+{"message": "  /api/v4/monitoring/alerts/history                            [GET]", "timestamp": "2025-11-11T15:38:12.387056", "level": "INFO", "logger": "ms_ml_despacho"}
+{"message": "  /api/v4/monitoring/alerts/statistics                         [GET]", "timestamp": "2025-11-11T15:38:12.391785", "level": "INFO", "logger": "ms_ml_despacho"}
+{"message": "  /api/v4/monitoring/alerts/<int:alert_id>/resolve             [POST]", "timestamp": "2025-11-11T15:38:12.395926", "level": "INFO", "logger": "ms_ml_despacho"}
+{"message": "  /api/v4/monitoring/dashboard                                 [GET]", "timestamp": "2025-11-11T15:38:12.401381", "level": "INFO", "logger": "ms_ml_despacho"}
+{"message": "  /api/v5/data/validate                                        [POST]", "timestamp": "2025-11-11T15:38:12.403567", "level": "INFO", "logger": "ms_ml_despacho"}
+{"message": "  /api/v5/data/metrics                                         [GET]", "timestamp": "2025-11-11T15:38:12.406571", "level": "INFO", "logger": "ms_ml_despacho"}
+{"message": "  /api/v5/data/distribution                                    [GET]", "timestamp": "2025-11-11T15:38:12.409282", "level": "INFO", "logger": "ms_ml_despacho"}
+{"message": "  /api/v5/data/drift-indicators                                [GET]", "timestamp": "2025-11-11T15:38:12.414864", "level": "INFO", "logger": "ms_ml_despacho"}
+{"message": "  /api/v5/data/training-data                                   [GET]", "timestamp": "2025-11-11T15:38:12.423747", "level": "INFO", "logger": "ms_ml_despacho"}
+{"message": "  /api/v5/data/report                                          [GET]", "timestamp": "2025-11-11T15:38:12.435879", "level": "INFO", "logger": "ms_ml_despacho"}
+{"message": "  /api/v6/retraining/run                                       [POST]", "timestamp": "2025-11-11T15:38:12.439725", "level": "INFO", "logger": "ms_ml_despacho"}
+{"message": "  /api/v6/retraining/status                                    [GET]", "timestamp": "2025-11-11T15:38:12.443105", "level": "INFO", "logger": "ms_ml_despacho"}
+{"message": "  /api/v6/retraining/history                                   [GET]", "timestamp": "2025-11-11T15:38:12.449388", "level": "INFO", "logger": "ms_ml_despacho"}
+{"message": "  /api/v6/retraining/config                                    [GET,POST]", "timestamp": "2025-11-11T15:38:12.458912", "level": "INFO", "logger": "ms_ml_despacho"}
+{"message": "  /api/v6/retraining/schedule                                  [GET]", "timestamp": "2025-11-11T15:38:12.463471", "level": "INFO", "logger": "ms_ml_despacho"}
+{"message": "  /api/v6/retraining/rollback                                  [POST]", "timestamp": "2025-11-11T15:38:12.466329", "level": "INFO", "logger": "ms_ml_despacho"}
+{"message": "\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550", "timestamp": "2025-11-11T15:38:12.470424", "level": "INFO", "logger": "ms_ml_despacho"}
+{"message": "Starting Flask server on 0.0.0.0:5000", "timestamp": "2025-11-11T15:38:12.483036", "level": "INFO", "logger": "ms_ml_despacho"}
+{"message": "Creating Flask app in production mode", "timestamp": "2025-11-11T20:34:02.957358", "level": "INFO", "logger": "ms_ml_despacho"}
+{"message": "Registering Dispatch Assignment routes...", "timestamp": "2025-11-11T20:34:02.964099", "level": "INFO", "logger": "ms_ml_despacho"}
+{"message": "\u2713 Dispatch Assignment routes registered successfully", "timestamp": "2025-11-11T20:34:02.972506", "level": "INFO", "logger": "ms_ml_despacho"}
+{"message": "Registering ML Dispatch routes...", "timestamp": "2025-11-11T20:34:02.973586", "level": "INFO", "logger": "ms_ml_despacho"}
+{"message": "\u2713 ML Dispatch routes registered successfully", "timestamp": "2025-11-11T20:34:04.516987", "level": "INFO", "logger": "ms_ml_despacho"}
+{"message": "Registering A/B Testing Dashboard routes...", "timestamp": "2025-11-11T20:34:04.525827", "level": "INFO", "logger": "ms_ml_despacho"}
+{"message": "\u2713 A/B Testing Dashboard routes registered successfully", "timestamp": "2025-11-11T20:34:04.823307", "level": "INFO", "logger": "ms_ml_despacho"}
+{"message": "Registering Monitoring Dashboard routes...", "timestamp": "2025-11-11T20:34:04.826686", "level": "INFO", "logger": "ms_ml_despacho"}
+{"message": "\u2713 Monitoring Dashboard routes registered successfully", "timestamp": "2025-11-11T20:34:13.902055", "level": "INFO", "logger": "ms_ml_despacho"}
+{"message": "Registering Real Data Collection routes...", "timestamp": "2025-11-11T20:34:13.931197", "level": "INFO", "logger": "ms_ml_despacho"}
+{"message": "\u2713 Real Data Collection routes registered successfully", "timestamp": "2025-11-11T20:34:13.997553", "level": "INFO", "logger": "ms_ml_despacho"}
+{"message": "Registering Retraining Pipeline routes...", "timestamp": "2025-11-11T20:34:14.031494", "level": "INFO", "logger": "ms_ml_despacho"}
+{"message": "\u2713 Retraining Pipeline routes registered successfully", "timestamp": "2025-11-11T20:34:16.688238", "level": "INFO", "logger": "ms_ml_despacho"}
+{"message": "Attempting to register original services...", "timestamp": "2025-11-11T20:34:16.688727", "level": "INFO", "logger": "ms_ml_despacho"}
+{"message": "\u26a0 Some original services not available: attempted relative import beyond top-level package", "timestamp": "2025-11-11T20:34:16.692841", "level": "WARNING", "logger": "ms_ml_despacho"}
+{"message": "\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550", "timestamp": "2025-11-11T20:34:16.696579", "level": "INFO", "logger": "ms_ml_despacho"}
+{"message": "Routes registered successfully", "timestamp": "2025-11-11T20:34:16.697142", "level": "INFO", "logger": "ms_ml_despacho"}
+{"message": "\u2713 Dispatch Assignment API available at /api/v1/dispatch", "timestamp": "2025-11-11T20:34:16.697649", "level": "INFO", "logger": "ms_ml_despacho"}
+{"message": "\u2713 ML Dispatch API available at /api/v2/dispatch", "timestamp": "2025-11-11T20:34:16.698126", "level": "INFO", "logger": "ms_ml_despacho"}
+{"message": "\u2713 A/B Testing Dashboard available at /api/v3/ab-testing", "timestamp": "2025-11-11T20:34:16.700693", "level": "INFO", "logger": "ms_ml_despacho"}
+{"message": "\u2713 Monitoring Dashboard available at /api/v4/monitoring", "timestamp": "2025-11-11T20:34:16.702912", "level": "INFO", "logger": "ms_ml_despacho"}
+{"message": "\u2713 Real Data Collection available at /api/v5/data", "timestamp": "2025-11-11T20:34:16.704600", "level": "INFO", "logger": "ms_ml_despacho"}
+{"message": "\u2713 Retraining Pipeline available at /api/v6/retraining", "timestamp": "2025-11-11T20:34:16.706985", "level": "INFO", "logger": "ms_ml_despacho"}
+{"message": "\u2713 Health check at /api/v1/dispatch/health", "timestamp": "2025-11-11T20:34:16.707497", "level": "INFO", "logger": "ms_ml_despacho"}
+{"message": "\nAll registered routes:", "timestamp": "2025-11-11T20:34:16.708065", "level": "INFO", "logger": "ms_ml_despacho"}
+{"message": "  /static/<path:filename>                                      [GET]", "timestamp": "2025-11-11T20:34:16.710107", "level": "INFO", "logger": "ms_ml_despacho"}
+{"message": "  /api/v1/dispatch/health                                      [GET]", "timestamp": "2025-11-11T20:34:16.711468", "level": "INFO", "logger": "ms_ml_despacho"}
+{"message": "  /api/v1/dispatch/test                                        [GET]", "timestamp": "2025-11-11T20:34:16.711897", "level": "INFO", "logger": "ms_ml_despacho"}
+{"message": "  /api/v1/dispatch/assign                                      [POST]", "timestamp": "2025-11-11T20:34:16.712415", "level": "INFO", "logger": "ms_ml_despacho"}
+{"message": "  /api/v2/dispatch/health                                      [GET]", "timestamp": "2025-11-11T20:34:16.714420", "level": "INFO", "logger": "ms_ml_despacho"}
+{"message": "  /api/v2/dispatch/predict                                     [POST]", "timestamp": "2025-11-11T20:34:16.715989", "level": "INFO", "logger": "ms_ml_despacho"}
+{"message": "  /api/v2/dispatch/predict/batch                               [POST]", "timestamp": "2025-11-11T20:34:16.717900", "level": "INFO", "logger": "ms_ml_despacho"}
+{"message": "  /api/v2/dispatch/model/info                                  [GET]", "timestamp": "2025-11-11T20:34:16.720601", "level": "INFO", "logger": "ms_ml_despacho"}
+{"message": "  /api/v2/dispatch/model/feature-importance                    [GET]", "timestamp": "2025-11-11T20:34:16.722366", "level": "INFO", "logger": "ms_ml_despacho"}
+{"message": "  /api/v3/ab-testing/status                                    [GET]", "timestamp": "2025-11-11T20:34:16.722867", "level": "INFO", "logger": "ms_ml_despacho"}
+{"message": "  /api/v3/ab-testing/dashboard                                 [GET]", "timestamp": "2025-11-11T20:34:16.726016", "level": "INFO", "logger": "ms_ml_despacho"}
+{"message": "  /api/v3/ab-testing/comparison                                [GET]", "timestamp": "2025-11-11T20:34:16.726674", "level": "INFO", "logger": "ms_ml_despacho"}
+{"message": "  /api/v3/ab-testing/decide-phase                              [POST]", "timestamp": "2025-11-11T20:34:16.727395", "level": "INFO", "logger": "ms_ml_despacho"}
+{"message": "  /api/v3/ab-testing/log                                       [POST]", "timestamp": "2025-11-11T20:34:16.727996", "level": "INFO", "logger": "ms_ml_despacho"}
+{"message": "  /api/v3/ab-testing/recommendation                            [GET]", "timestamp": "2025-11-11T20:34:16.728435", "level": "INFO", "logger": "ms_ml_despacho"}
+{"message": "  /api/v3/ab-testing/metrics                                   [GET]", "timestamp": "2025-11-11T20:34:16.729060", "level": "INFO", "logger": "ms_ml_despacho"}
+{"message": "  /api/v3/ab-testing/strategies                                [GET]", "timestamp": "2025-11-11T20:34:16.731064", "level": "INFO", "logger": "ms_ml_despacho"}
+{"message": "  /api/v4/monitoring/health                                    [GET]", "timestamp": "2025-11-11T20:34:16.735535", "level": "INFO", "logger": "ms_ml_despacho"}
+{"message": "  /api/v4/monitoring/health/database                           [GET]", "timestamp": "2025-11-11T20:34:16.738976", "level": "INFO", "logger": "ms_ml_despacho"}
+{"message": "  /api/v4/monitoring/health/model                              [GET]", "timestamp": "2025-11-11T20:34:16.740208", "level": "INFO", "logger": "ms_ml_despacho"}
+{"message": "  /api/v4/monitoring/health/predictions                        [GET]", "timestamp": "2025-11-11T20:34:16.744451", "level": "INFO", "logger": "ms_ml_despacho"}
+{"message": "  /api/v4/monitoring/health/fallback                           [GET]", "timestamp": "2025-11-11T20:34:16.745733", "level": "INFO", "logger": "ms_ml_despacho"}
+{"message": "  /api/v4/monitoring/drift/prediction                          [GET]", "timestamp": "2025-11-11T20:34:16.747687", "level": "INFO", "logger": "ms_ml_despacho"}
+{"message": "  /api/v4/monitoring/drift/performance                         [GET]", "timestamp": "2025-11-11T20:34:16.748250", "level": "INFO", "logger": "ms_ml_despacho"}
+{"message": "  /api/v4/monitoring/drift/data-quality                        [GET]", "timestamp": "2025-11-11T20:34:16.750824", "level": "INFO", "logger": "ms_ml_despacho"}
+{"message": "  /api/v4/monitoring/alerts/active                             [GET]", "timestamp": "2025-11-11T20:34:16.752291", "level": "INFO", "logger": "ms_ml_despacho"}
+{"message": "  /api/v4/monitoring/alerts/history                            [GET]", "timestamp": "2025-11-11T20:34:16.755752", "level": "INFO", "logger": "ms_ml_despacho"}
+{"message": "  /api/v4/monitoring/alerts/statistics                         [GET]", "timestamp": "2025-11-11T20:34:16.758373", "level": "INFO", "logger": "ms_ml_despacho"}
+{"message": "  /api/v4/monitoring/alerts/<int:alert_id>/resolve             [POST]", "timestamp": "2025-11-11T20:34:16.758723", "level": "INFO", "logger": "ms_ml_despacho"}
+{"message": "  /api/v4/monitoring/dashboard                                 [GET]", "timestamp": "2025-11-11T20:34:16.759885", "level": "INFO", "logger": "ms_ml_despacho"}
+{"message": "  /api/v5/data/validate                                        [POST]", "timestamp": "2025-11-11T20:34:16.762269", "level": "INFO", "logger": "ms_ml_despacho"}
+{"message": "  /api/v5/data/metrics                                         [GET]", "timestamp": "2025-11-11T20:34:16.763488", "level": "INFO", "logger": "ms_ml_despacho"}
+{"message": "  /api/v5/data/distribution                                    [GET]", "timestamp": "2025-11-11T20:34:16.764158", "level": "INFO", "logger": "ms_ml_despacho"}
+{"message": "  /api/v5/data/drift-indicators                                [GET]", "timestamp": "2025-11-11T20:34:16.764803", "level": "INFO", "logger": "ms_ml_despacho"}
+{"message": "  /api/v5/data/training-data                                   [GET]", "timestamp": "2025-11-11T20:34:16.767946", "level": "INFO", "logger": "ms_ml_despacho"}
+{"message": "  /api/v5/data/report                                          [GET]", "timestamp": "2025-11-11T20:34:16.770498", "level": "INFO", "logger": "ms_ml_despacho"}
+{"message": "  /api/v6/retraining/run                                       [POST]", "timestamp": "2025-11-11T20:34:16.772049", "level": "INFO", "logger": "ms_ml_despacho"}
+{"message": "  /api/v6/retraining/status                                    [GET]", "timestamp": "2025-11-11T20:34:16.774720", "level": "INFO", "logger": "ms_ml_despacho"}
+{"message": "  /api/v6/retraining/history                                   [GET]", "timestamp": "2025-11-11T20:34:16.776460", "level": "INFO", "logger": "ms_ml_despacho"}
+{"message": "  /api/v6/retraining/config                                    [GET,POST]", "timestamp": "2025-11-11T20:34:16.782485", "level": "INFO", "logger": "ms_ml_despacho"}
+{"message": "  /api/v6/retraining/schedule                                  [GET]", "timestamp": "2025-11-11T20:34:16.786924", "level": "INFO", "logger": "ms_ml_despacho"}
+{"message": "  /api/v6/retraining/rollback                                  [POST]", "timestamp": "2025-11-11T20:34:16.790923", "level": "INFO", "logger": "ms_ml_despacho"}
+{"message": "\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550", "timestamp": "2025-11-11T20:34:16.794718", "level": "INFO", "logger": "ms_ml_despacho"}
+{"message": "Starting Flask server on 0.0.0.0:5000", "timestamp": "2025-11-11T20:34:16.801390", "level": "INFO", "logger": "ms_ml_despacho"}
