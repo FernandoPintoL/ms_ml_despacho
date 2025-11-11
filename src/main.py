@@ -138,6 +138,17 @@ def register_routes(app: Flask):
             import traceback
             logger.error(f"Traceback: {traceback.format_exc()}")
 
+        # Register A/B Testing Dashboard Routes (Fase 3)
+        logger.info("Registering A/B Testing Dashboard routes...")
+        try:
+            from api.ab_testing_dashboard import ab_testing_bp
+            app.register_blueprint(ab_testing_bp)
+            logger.info("✓ A/B Testing Dashboard routes registered successfully")
+        except Exception as e:
+            logger.error(f"✗ Could not register A/B Testing Dashboard routes: {e}")
+            import traceback
+            logger.error(f"Traceback: {traceback.format_exc()}")
+
         # Initialize services (COMENTADO TEMPORALMENTE - HAY ERROR DE IMPORT)
         logger.info("Attempting to register original services...")
         try:
