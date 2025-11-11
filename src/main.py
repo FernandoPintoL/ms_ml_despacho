@@ -127,6 +127,17 @@ def register_routes(app: Flask):
             import traceback
             logger.error(f"Traceback: {traceback.format_exc()}")
 
+        # Register ML Dispatch Routes (Fase 2)
+        logger.info("Registering ML Dispatch routes...")
+        try:
+            from api.dispatch_ml import dispatch_ml_bp
+            app.register_blueprint(dispatch_ml_bp)
+            logger.info("✓ ML Dispatch routes registered successfully")
+        except Exception as e:
+            logger.error(f"✗ Could not register ML dispatch routes: {e}")
+            import traceback
+            logger.error(f"Traceback: {traceback.format_exc()}")
+
         # Initialize services (COMENTADO TEMPORALMENTE - HAY ERROR DE IMPORT)
         logger.info("Attempting to register original services...")
         try:
