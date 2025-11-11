@@ -5,6 +5,10 @@ Main entry point for Flask application
 
 import os
 import sys
+
+# Add src directory to path for absolute imports
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+
 from flask import Flask, jsonify
 from flask_cors import CORS
 from prometheus_client import make_wsgi_app
@@ -65,6 +69,24 @@ def create_app(config_class=None):
             'environment': ENV
         }), 200
 
+    # Test endpoint to debug Flask routing
+    @app.route('/api/v1/dispatch/test-direct', methods=['GET', 'POST'])
+    def test_direct():
+        """Direct endpoint in main.py"""
+        return jsonify({
+            'status': 'success',
+            'message': 'Direct endpoint in main.py works'
+        }), 200
+
+    # Simpler test
+    @app.route('/test-simple', methods=['GET', 'POST'])
+    def test_simple():
+        """Simple test endpoint"""
+        return jsonify({
+            'status': 'success',
+            'message': 'Simple test works'
+        }), 200
+
     @app.route('/health/detailed', methods=['GET'])
     def health_check_detailed():
         """Detailed health check"""
@@ -94,71 +116,97 @@ def register_routes(app: Flask):
     logger = get_logger()
 
     try:
-        # Initialize services
-        from services import (
-            ModelManager, PredictionService, TrainingService,
-            OptimizationService, HealthService
-        )
-        from repositories import (
-            DispatchRepository, AmbulanceRepository, ModelRepository,
-            CacheRepository
-        )
-        from api.rest_routes import create_rest_routes
-        from graphql import schema as graphql_schema
+        # Register Dispatch Assignment Routes (Fase 1) - PRIMERO, ANTES QUE LOS OTROS
+        logger.info("Registering Dispatch Assignment routes...")
+        try:
+            from api.dispatch_simple import dispatch_assignment_bp
+            app.register_blueprint(dispatch_assignment_bp)
+            logger.info("✓ Dispatch Assignment routes registered successfully")
+        except Exception as e:
+            logger.error(f"✗ Could not register dispatch assignment routes: {e}")
+            import traceback
+            logger.error(f"Traceback: {traceback.format_exc()}")
 
-        # Initialize database and cache connections
-        db_connection = None  # Will be initialized with database connection
-        redis_client = None   # Will be initialized with redis client
+        # Initialize services (COMENTADO TEMPORALMENTE - HAY ERROR DE IMPORT)
+        logger.info("Attempting to register original services...")
+        try:
+            from services import (
+                ModelManager, PredictionService, TrainingService,
+                OptimizationService, HealthService
+            )
+            from repositories import (
+                DispatchRepository, AmbulanceRepository, ModelRepository,
+                CacheRepository
+            )
+            from api.rest_routes import create_rest_routes
+            from graphql import schema as graphql_schema
 
-        # Initialize repositories
-        dispatch_repo = DispatchRepository(db_connection, redis_client)
-        ambulance_repo = AmbulanceRepository(db_connection, redis_client)
-        model_repo = ModelRepository(db_connection, redis_client)
-        cache_repo = CacheRepository(redis_client)
+            # Initialize database and cache connections
+            db_connection = None  # Will be initialized with database connection
+            redis_client = None   # Will be initialized with redis client
 
-        # Initialize services
-        model_manager = ModelManager(model_repo)
-        model_manager.load_active_models()
+            # Initialize repositories
+            dispatch_repo = DispatchRepository(db_connection, redis_client)
+            ambulance_repo = AmbulanceRepository(db_connection, redis_client)
+            model_repo = ModelRepository(db_connection, redis_client)
+            cache_repo = CacheRepository(redis_client)
 
-        prediction_service = PredictionService(
-            model_manager, dispatch_repo, ambulance_repo, model_repo, cache_repo
-        )
+            # Initialize services
+            model_manager = ModelManager(model_repo)
+            model_manager.load_active_models()
 
-        training_service = TrainingService(
-            model_manager, dispatch_repo, model_repo, cache_repo
-        )
+            prediction_service = PredictionService(
+                model_manager, dispatch_repo, ambulance_repo, model_repo, cache_repo
+            )
 
-        optimization_service = OptimizationService(
-            prediction_service, dispatch_repo, ambulance_repo, cache_repo
-        )
+            training_service = TrainingService(
+                model_manager, dispatch_repo, model_repo, cache_repo
+            )
 
-        health_service = HealthService(
-            model_manager, model_repo, cache_repo, dispatch_repo, ambulance_repo
-        )
+            optimization_service = OptimizationService(
+                prediction_service, dispatch_repo, ambulance_repo, cache_repo
+            )
 
-        # Register REST API routes
-        rest_api = create_rest_routes(
-            prediction_service,
-            optimization_service,
-            health_service,
-            dispatch_repo,
-            ambulance_repo
-        )
-        app.register_blueprint(rest_api)
+            health_service = HealthService(
+                model_manager, model_repo, cache_repo, dispatch_repo, ambulance_repo
+            )
 
-        # Register GraphQL endpoint
-        from strawberry.flask.views import GraphQLView
-        app.add_url_rule(
-            "/graphql",
-            view_func=GraphQLView.for_app(graphql_schema, debug=app.config.get('DEBUG', False))
-        )
+            # Register REST API routes
+            rest_api = create_rest_routes(
+                prediction_service,
+                optimization_service,
+                health_service,
+                dispatch_repo,
+                ambulance_repo
+            )
+            app.register_blueprint(rest_api)
+            logger.info("✓ Original services registered successfully")
 
+            # Register GraphQL endpoint
+            from strawberry.flask.views import GraphQLView
+            app.add_url_rule(
+                "/graphql",
+                view_func=GraphQLView.for_app(graphql_schema, debug=app.config.get('DEBUG', False))
+            )
+            logger.info("✓ GraphQL registered successfully")
+
+        except ImportError as e:
+            logger.warning(f"⚠ Some original services not available: {e}")
+        except Exception as e:
+            logger.warning(f"⚠ Error registering original services: {str(e)}")
+
+        logger.info("═══════════════════════════════════════════════════════")
         logger.info("Routes registered successfully")
-        logger.info("REST API available at /api/v1")
-        logger.info("GraphQL available at /graphql")
+        logger.info("✓ Dispatch Assignment API available at /api/v1/dispatch")
+        logger.info("✓ Health check at /api/v1/dispatch/health")
 
-    except ImportError as e:
-        logger.warning(f"Routes not yet fully implemented: {e}")
+        # Debug: Print all registered routes
+        logger.info("\nAll registered routes:")
+        for rule in app.url_map.iter_rules():
+            methods = ','.join(sorted(rule.methods - {'OPTIONS', 'HEAD'}))
+            logger.info(f"  {rule.rule:60s} [{methods}]")
+        logger.info("═══════════════════════════════════════════════════════")
+
     except Exception as e:
         logger.error(f"Error registering routes: {str(e)}")
 
